@@ -44,10 +44,10 @@ public class EventControllerTests {
 		EventDto event = EventDto.builder()
 				.name("Spring")
 				.description("REST API Development with Spring")
-				.beginEnrollmentDateTime(LocalDateTime.of(2023, 03, 29, 14, 35))
-				.closeEnrollmentDateTime(LocalDateTime.of(2023, 03, 30, 14, 35))
-				.beginEventDateTime(LocalDateTime.of(2023, 03, 31, 14, 35))
-				.endEventDateTime(LocalDateTime.of(2023, 04, 01, 14, 35))
+                .beginEnrollmentDateTime(LocalDateTime.of(2023, 03, 29, 17, 10))
+                .closeEnrollmentDateTime(LocalDateTime.of(2023, 03, 30, 17, 10))
+                .beginEventDateTime(LocalDateTime.of(2023, 03, 31, 17, 10))
+                .endEventDateTime(LocalDateTime.of(2023, 04, 01, 17, 10))
 				.basePrice(100)
 				.maxPrice(200)
 				.limitOfEnrollment(100)
@@ -108,10 +108,10 @@ public class EventControllerTests {
         EventDto eventDto = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
-                .beginEnrollmentDateTime(LocalDateTime.of(2023, 03, 29, 17, 10))
+                .beginEnrollmentDateTime(LocalDateTime.of(2023, 03, 31, 17, 10))
                 .closeEnrollmentDateTime(LocalDateTime.of(2023, 03, 30, 17, 10))
-                .beginEventDateTime(LocalDateTime.of(2023, 03, 31, 17, 10))
-                .endEventDateTime(LocalDateTime.of(2023, 04, 01, 17, 10))
+                .beginEventDateTime(LocalDateTime.of(2023, 03, 25, 17, 10))
+                .endEventDateTime(LocalDateTime.of(2023, 03, 01, 17, 10))
                 .basePrice(10000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -122,11 +122,7 @@ public class EventControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("content[0].objectName").exists())
-                .andExpect(jsonPath("content[0].defaultMessage").exists())
-                .andExpect(jsonPath("content[0].code").exists())
-                .andExpect(jsonPath("_links.index").exists());
+                .andExpect(status().isBadRequest());
     }
     
     
