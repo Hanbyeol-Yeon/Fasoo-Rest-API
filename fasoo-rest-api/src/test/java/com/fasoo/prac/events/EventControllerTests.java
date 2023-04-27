@@ -1,5 +1,7 @@
 package com.fasoo.prac.events;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -7,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.stream.IntStream;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -24,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasoo.prac.accounts.Account;
 import com.fasoo.prac.common.TestDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +42,9 @@ public class EventControllerTests {
 	@Autowired
 	ObjectMapper objectMapper;
 		
+	@Autowired
+	EventRepository eventRepository;
+	
 	@Test
 	@TestDescription("정상적으로 이벤트 생성하는 테스트")
 	public void createEvent() throws Exception {
@@ -125,5 +132,58 @@ public class EventControllerTests {
                 .andExpect(status().isBadRequest());
     }
     
+    @Test
+    @TestDescription("30개의 이벤트를 10개씩 두번째 페이지 조회하기")
+    public void queryEvents() throws Exception {
+        // Given
+        IntStream.range(0, 30).forEach(this::generateEvent);
+
+        // When & Then
+        this.mockMvc.perform(get("/api/events")
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "name,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
     
+    @Test
+    @TestDescription("특정 가격 내의 이벤트를 조회하기")
+    public void queryEventsByBasePrice() throws Exception {
+        // Given
+    	IntStream.range(0, 30).forEach(this::generateEvent);
+
+        // When & Then
+        this.mockMvc.perform(get("/api/events/base-price")
+                .param("startBasePrice", "100")
+                .param("endBasePrice", "200")
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "name,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }    
+    
+    private Event generateEvent(int index) {
+        Event event = buildEvent(index);
+        return this.eventRepository.save(event);
+    }
+
+    private Event buildEvent(int index) {
+        return Event.builder()
+                    .name("event " + index)
+                    .description("test event")
+                    .beginEnrollmentDateTime(LocalDateTime.of(2023, 04, 22, 10, 10))
+                    .closeEnrollmentDateTime(LocalDateTime.of(2023, 04, 23, 10, 10))
+                    .beginEventDateTime(LocalDateTime.of(2023, 04, 24, 10, 10))
+                    .endEventDateTime(LocalDateTime.of(2023, 04, 25, 10, 10))
+                    .basePrice(150)
+                    .maxPrice(200)
+                    .limitOfEnrollment(100)
+                    .location("누리꿈스퀘어 6층 파수")
+                    .free(false)
+                    .offline(true)
+                    .eventStatus(EventStatus.DRAFT)
+                    .build();
+    }
 }
